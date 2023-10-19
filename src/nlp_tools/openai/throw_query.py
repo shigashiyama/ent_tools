@@ -158,6 +158,11 @@ def main():
         type=str,
     )
     parser.add_argument(
+        '--prompt_examples_max_num',
+        type=int,
+        default=5,
+    )
+    parser.add_argument(
         '--price_per_token',
         type=float,
         default=0,
@@ -188,7 +193,8 @@ def main():
 
     # Prepare few-shot examples
     if args.prompt_examples_path:
-        ex_texts, ex_labels = load_examples(args.prompt_examples_path)
+        ex_texts, ex_labels = load_examples(
+            args.prompt_examples_path, max_num_sents=args.prompt_examples_max_num)
         msg_examples = gen_message_of_examples(
             ex_texts, ex_labels, args.prompt_input_head, args.prompt_input_tail)
     else:

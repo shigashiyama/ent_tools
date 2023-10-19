@@ -37,8 +37,9 @@ python src/nlp_tools/openai/throw_query.py \
        --prompt_input_head "$PROMPT_INPUT_HEAD" \
        --prompt_input_tail "$PROMPT_INPUT_TAIL" \
        --prompt_examples_path "$PROMPT_EXAMPLES_PATH" \
+       --prompt_examples_max_num 5 \
        --rate_dollar_to_yen $RATE_DOLLAR_TO_YEN \
-       --price_per_token $PRICE_PER_TOKEN
+       --price_per_token $PRICE_PER_TOKEN \
 
 python src/nlp_tools/openai/convert_output_to_json.py \
        -i $OUTPUT_TXT_PATH \
