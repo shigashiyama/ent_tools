@@ -1,2 +1,0 @@
-sample_01        https://www.meti.go.jp/press/2022/12/20221222003/20221222003.html
-sample_02        https://www.mlit.go.jp/report/press/content/001472428.pdf
