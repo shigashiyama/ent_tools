@@ -31,8 +31,8 @@ mkdir -p $OUTPUT_DIR/json
 
 INPUT_TXT_DIR=data/original/sample_ja_ner
 for INPUT_TXT_PATH in $INPUT_TXT_DIR/*.txt; do
-    DOC_NAME=`basename $INPUT_TXT_PATH`
-    DOC_NAME=${DOC_NAME%.*}
+    FILE_NAME=`basename $INPUT_TXT_PATH`
+    DOC_NAME=${FILE_NAME%.*}
     OUTPUT_TXT_PATH=$OUTPUT_DIR/txt/$DOC_NAME.txt
     OUTPUT_JSON_PATH=$OUTPUT_DIR/json_per_doc/$DOC_NAME.json
 

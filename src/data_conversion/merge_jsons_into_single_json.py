@@ -13,9 +13,20 @@ from common.data_io import load_json, write_as_json
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_dirs', required=True)
-    parser.add_argument('-o', '--output_path', required=True)
-    parser.add_argument('-t', '--target_ids_path')
+    parser.add_argument(
+        '--input_dirs', '-i',
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        '--output_path', '-o',
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        '--target_ids_path', '-t',
+        type=str,
+    )
     args = parser.parse_args()
 
     if args.target_ids_path:
@@ -27,7 +38,6 @@ def main():
         target_ids = None
 
     data = {}
-
     for input_dir in args.input_dirs.split(','):
         for file_name in os.listdir(input_dir):
             if not file_name.endswith('.json'):
