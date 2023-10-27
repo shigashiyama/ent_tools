@@ -44,7 +44,7 @@ class CountForMR:
                         (men[SPAN][0], men[SPAN][1], men[ENT_TYPE]))
 
             else:
-                logger.warning('Prediction for {doc_id} is not available.')
+                logger.warning(f'Prediction for {doc_id} is not available.')
 
             for sen_id in sen_ids:
                 self.update(sen_id2gold_spans[sen_id], sen_id2pred_spans[sen_id])
