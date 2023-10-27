@@ -3,6 +3,8 @@ import os
 import sys
 from typing import Tuple
 
+from logzero import logger
+
 sys.path.append('src')          # TODO remove
 from common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
 from common.data_io import write_as_json
@@ -20,11 +22,17 @@ def get_spans(
 
     cur_index = 0
     for mention_str in res_str.strip('[]').split(';'):
-        mention_text_, label_ = mention_str.split(',')
-        men_text = mention_text_.strip('"')
-        label = label_.strip('"')
+        if '","' in mention_str:
+            mention_text_, label_ = mention_str.split('","')
+        else:
+            mention_text_, label_ = mention_str.split(',')
+        men_text = mention_text_.strip(' "')
+        label = label_.strip(' "')
 
-        assert men_text in text[cur_index:]
+        if not men_text in text[cur_index:]:
+            logger.warning(f'Recognized mention "{men_text}" is skipped because it is not in input text with offset>={cur_index} "{text[cur_index:]}\nfull_text="{text}"\nfull_result="{res_str}"')
+            continue
+
         begin = text.index(men_text, cur_index)
         end = begin + len(men_text)
         spans.append((men_text, (begin, end), label))

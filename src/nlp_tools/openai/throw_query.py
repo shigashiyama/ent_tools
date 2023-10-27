@@ -1,11 +1,14 @@
 import argparse
 import os
+import time
 from typing import Tuple
 
 import openai
 import tiktoken
 
 from logzero import logger
+
+MAX_RETRY_NUM = 5
 
 
 def get_tokenizer(
@@ -80,17 +83,22 @@ def throw_query(
 ) -> str:
 
     logger.info(f"Start querying a prompt to {model_name}.")
-    res = openai.ChatCompletion.create(
-        model=model_name,
-        messages=[{"role": "user", "content": message}],
-        max_tokens=max_tokens,
-        temperature=temperature,
-        top_p=top_p,
-    )
-    res_content = res.choices[0]["message"]["content"]
-    logger.info(f"Responce: {res_content}")    
-    logger.info(f"Finish querying a prompt to {model_name}.")    
-    return res_content
+    try:
+        res = openai.ChatCompletion.create(
+            model=model_name,
+            messages=[{"role": "user", "content": message}],
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+        )
+        res_content = res.choices[0]["message"]["content"]
+        logger.info(f"Responce: {res_content}")
+        logger.info(f"Finish querying a prompt to {model_name}.")
+        return res_content, 0
+
+    except openai.error.RateLimitError as e:
+        logger.error(str(e))
+        return '<<ERROR>>', -1
 
 
 def write_results(
@@ -128,8 +136,8 @@ def main():
     )
     parser.add_argument(
         '--max_tokens',
+        default=None,
         type=int,
-        default=3000,
     )
     parser.add_argument(
         '--temperature',
@@ -140,6 +148,11 @@ def main():
         '--top_p',
         type=float,
         default=1,
+    )
+    parser.add_argument(
+        '--waiting_time_second', '-wait',
+        type=int,
+        default=0,
     )
     parser.add_argument(
         '--prompt_instruction',
@@ -173,13 +186,19 @@ def main():
         default=150,
     )
     parser.add_argument(
-        '--simulate_without_querying', '-sim',
+        '--simulate_with_price_estimation', '-sim1',
+        action='store_true',
+    )
+    parser.add_argument(
+        '--simulate_without_price_estimation', '-sim2',
         action='store_true',
     )
     args = parser.parse_args()
 
-    if args.simulate_without_querying:
-        logger.info(f'Specified --simulate_without_querying.')
+    if args.simulate_with_price_estimation:
+        logger.info(f'Specified --simulate_with_price_estimation.')
+    elif args.simulate_without_price_estimation:
+        logger.info(f'Specified --simulate_without_price_estimation.')
     else:
         openai.api_key = os.environ['OPENAI_API_KEY']
         logger.info(f'Set openai.api_key: ***')
@@ -188,7 +207,9 @@ def main():
 
     logger.info(f"Model name: {args.model_name}")
 
-    if not args.simulate_without_querying:
+    if args.simulate_without_price_estimation:
+        encoder = None
+    else:
         encoder = get_tokenizer(args.model_name)
 
     # Prepare few-shot examples
@@ -204,10 +225,11 @@ def main():
     input_texts = read_input_text(args.input_txt_path)
 
     # Throw API query for each input example
-    calc_price = (not args.simulate_without_querying
+    calc_price = (not args.simulate_without_price_estimation
                   and args.price_per_token > 0
                   and args.rate_dollar_to_yen > 0)
     total_price_dol = 0
+    total_n_tokens = 0
     results = []
     for text in input_texts:
         if text.strip(' 　'):
@@ -215,30 +237,53 @@ def main():
                    + (f'{msg_examples}\n' if msg_examples else '')
                    + f'{args.prompt_input_head}{text}\n{args.prompt_input_tail}')
 
-            if args.simulate_without_querying:
+            if calc_price:
+                n_tokens = len(encoder.encode(msg))
+                total_n_tokens += n_tokens
+                price_dol = n_tokens * args.price_per_token
+                price_yen = price_dol * args.rate_dollar_to_yen
+                total_price_dol += price_dol
+                logger.info(f'Estimated price: ${price_dol:.6f}; \\{price_yen:.6f}; {n_tokens} tokens')
+
+            if (args.simulate_with_price_estimation
+                or args.simulate_without_price_estimation
+            ):
                 logger.info(f'Query (simulation):\n{msg}')
                 results.append(None)
             else:
-                if calc_price:
-                    n_tokens = len(encoder.encode(msg))
-                    price_dol = n_tokens * args.price_per_token
-                    price_yen = price_dol * args.rate_dollar_to_yen
-                    total_price_dol += price_dol
-                    logger.info(f'Estimated price: ${price_dol:.6f} (\\{price_yen:.6f})')
+                retry_flag = True
+                retry_num = 0
+                while retry_flag and retry_num <= MAX_RETRY_NUM:
+                    logger.info(f'Query:\n{msg}')
+                    retry_num += 1
+                    res_content, error_flag = throw_query(
+                        msg, args.model_name,
+                        args.max_tokens,
+                        args.temperature,
+                        args.top_p)
 
-                logger.info(f'Query:\n{msg}')
-                res_content = throw_query(msg, args.model_name,
-                                          args.max_tokens,
-                                          args.temperature,
-                                          args.top_p)
+                    if error_flag == -1:
+                        logger.info(f'Wait 60 seconds for RateLimitError.')
+                        time.sleep(60)
+                    else:
+                        retry_flag = False
+
+                if retry_num > MAX_RETRY_NUM:
+                    logger.info(f'Queries for this sentence failed f{retry_num} times. Skip.')
+
                 results.append(res_content)
+
+                if args.waiting_time_second > 0:
+                    logger.info(f'Wait {args.waiting_time_second} seconds.')
+                    time.sleep(args.waiting_time_second)
+
         else:
             logger.info(f'Skip empty text')
             results.append(None)
 
     if calc_price:
         total_price_yen = total_price_dol * args.rate_dollar_to_yen
-        logger.info(f'Total estimated price: ${total_price_dol:.6f} (\\{total_price_yen:.6f})')
+        logger.info(f'Total estimated price: ${total_price_dol:.6f}; \\{total_price_yen:.6f}; {total_n_tokens} tokens')
 
     # Save results
     write_results(args.output_txt_path, input_texts, results)
