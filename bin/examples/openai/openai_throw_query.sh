@@ -55,7 +55,6 @@ for INPUT_TXT_PATH in $INPUT_TXT_DIR/*.txt; do
 done
 
 ## Merge json files into a single json file
-MERGED_JSON_PATH=$OUTPUT_DIR/json/all.json
 python src/data_conversion/merge_jsons_into_single_json.py \
        -i $OUTPUT_DIR/json_per_doc \
-       -o $MERGED_JSON_PATH
+       -o $OUTPUT_DIR/json/all.json
