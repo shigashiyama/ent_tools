@@ -11,7 +11,7 @@ RATE_DOLLAR_TO_YEN=150
 PRICE_PER_TOKEN=`bc  <<< "scale=7; 0.0015/1000"`
 
 # Change prompt infomation if necessary
-PROMPT_INSTRUCT='Given the list of entity types ["ORGANIZATION", "LOCATION", "FACILITY"], read the given sentence and find out all words/phrases that indicate the above types of named entities. Answer in the formeat ["entity_name","entity_type";"entity_name","entity_type";...] in the order of appearance without any explanation. Extract all instances even when named entities with the same exspression appears multiple times. If no entity exists, then just answer "[]".'
+PROMPT_INSTRUCT='Given the list of entity types ["ORGANIZATION", "LOCATION", "FACILITY"], read the given sentence and find out all words/phrases that indicate the above types of named entities. Answer in the format ["entity_name","entity_type";"entity_name","entity_type";...] in the order of appearance without any explanation. Extract all instances even when named entities with the same exspression appears multiple times. If no entity exists, then just answer "[]".'
 PROMPT_INPUT_HEAD='Sentence: '
 PROMPT_INPUT_TAIL='Answer: '
 PROMPT_EXAMPLES_PATH=data/supplement/llm_prompt/examples_jawiki_nara_city.tsv
