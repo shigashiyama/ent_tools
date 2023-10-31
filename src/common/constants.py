@@ -9,4 +9,5 @@ MEN_IDS   = 'mention_ids'
 
 MENS      = 'mentions'
 SPAN      = 'span'
+MEN_TYPE  = 'mention_type'
 ENT_TYPE  = 'entity_type'

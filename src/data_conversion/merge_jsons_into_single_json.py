@@ -7,7 +7,7 @@ import sys
 from logzero import logger
 
 sys.path.append('src')          # TODO remove
-from common.constants import SENS, MENS, ENT_TYPE
+from common.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
 from common.data_io import load_json, write_as_json
 
 
@@ -67,7 +67,10 @@ def main():
             counter['num_mens'] += len(doc[MENS])
 
             for men_id, men in doc[MENS].items():
-                counter[f'num_mens:{men[ENT_TYPE]}'] += 1
+                if ENT_TYPE in men:
+                    counter[f'num_mens:{men[ENT_TYPE]}'] += 1
+                if MEN_TYPE in men:
+                    counter[f'num_mens:{men[MEN_TYPE]}'] += 1
 
         logger.info('Data statistics.')
         main_keys = ['num_docs', 'num_sens', 'num_mens']
