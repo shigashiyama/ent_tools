@@ -1,6 +1,6 @@
 import argparse
-import sys
 
+import logzero
 from logzero import logger
 
 import spacy
@@ -9,10 +9,9 @@ from spacy.scorer import Scorer
 from spacy.training import Example
 from spacy.tokens import DocBin
 
-sys.path.append('src')          # TODO remove
-from common.data_io import load_json
-from nlp_tools.spacy.data_io import load_spacy_data
-from nlp_tools.spacy.util import load_model, prepare_ner_model
+from ent_tools.common.data_io import load_json
+from ent_tools.nlp_tools.spacy.data_io import load_spacy_data
+from ent_tools.nlp_tools.spacy.util import load_model, prepare_ner_model
 
 
 def get_score_string(
@@ -45,7 +44,7 @@ def evaluate(
             logger.info(f'Parserd {i+1} sentences.')
 
         for tok in doc_parsed:
-            print('-', tok, tok.ent_type, doc.vocab.strings[tok.ent_type])
+            logger.debug(f'- tok={tok}, tok.ent_type={tok.ent_type} ({doc.vocab.strings[tok.ent_type]})')
             if labelmap:
                 ent_type_str = doc.vocab.strings[tok.ent_type]
                 if ent_type_str in labelmap:
@@ -79,6 +78,8 @@ def main():
         default=None,
     )
     args = parser.parse_args()
+
+    logzero.loglevel(20)
 
     # load model
     nlp = load_model(args.model_name)

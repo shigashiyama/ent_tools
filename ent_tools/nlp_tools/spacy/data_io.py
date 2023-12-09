@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from typing import Tuple
 
 from logzero import logger
@@ -9,9 +8,8 @@ import spacy
 from spacy.tokens import DocBin
 from spacy.util import filter_spans
 
-sys.path.append('src')          # TODO remove
-from common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
-from nlp_tools.spacy.util import load_model
+from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.nlp_tools.spacy.util import load_model
 
 
 def load_spacy_data(

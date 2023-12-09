@@ -1,12 +1,10 @@
 import argparse
-import sys
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.data_io import load_json
-from common.data_statistics import get_stats_from_dict, get_stats_from_docbin
-from nlp_tools.spacy.data_io import convert_dict_to_docbin
+from ent_tools.common.data_io import load_json
+from ent_tools.common.data_statistics import get_stats_from_dict, get_stats_from_docbin
+from ent_tools.nlp_tools.spacy.data_io import convert_dict_to_docbin
 
 
 def main():

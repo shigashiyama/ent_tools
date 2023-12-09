@@ -1,17 +1,15 @@
 import argparse
 import json
 import os
-import sys
 
 from logzero import logger
 
 from spacy import Language
 from spacy.tokens import DocBin, Doc
 
-sys.path.append('src')          # TODO remove
-from common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
-from nlp_tools.spacy.data_io import load_spacy_data
-from nlp_tools.spacy.util import get_simple_span, load_model, prepare_ner_model
+from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.nlp_tools.spacy.data_io import load_spacy_data
+from ent_tools.nlp_tools.spacy.util import get_simple_span, load_model, prepare_ner_model
 
 
 def decode_and_save_as_json(

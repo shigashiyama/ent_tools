@@ -4,8 +4,8 @@ import spacy
 from spacy import Language
 from spacy.tokens import DocBin
 
-from common.constants import DOC_ID, SENS, SEN_ID, MENS, ENT_TYPE
-from nlp_tools.spacy.util import get_simple_span
+from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, MENS, ENT_TYPE
+from ent_tools.nlp_tools.spacy.util import get_simple_span
 
 
 def get_stats_from_dict(
