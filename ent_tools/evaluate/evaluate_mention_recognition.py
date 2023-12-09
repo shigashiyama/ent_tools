@@ -1,15 +1,13 @@
 import argparse
 from collections import Counter
-import sys
 from typing import Tuple
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
-from common.data_io import load_json, write_as_json
-from evaluate.util import GOLD, PRED, CORRECT
-from evaluate.util import get_PRF_scores, get_PRF_scores_str
+from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.common.data_io import load_json, write_as_json
+from ent_tools.evaluate.util import GOLD, PRED, CORRECT
+from ent_tools.evaluate.util import get_PRF_scores, get_PRF_scores_str
 
 
 class CountForMR:

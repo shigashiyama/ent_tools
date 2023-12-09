@@ -34,7 +34,7 @@ def get_PRF_scores(
         label_display_order: list = [],
 ) -> str:
     
-    scores = {'overall': None, 'each_label': {}}
+    scores = {'Overall': None, 'each_label': {}}
 
     # Adjust label display order
     labels = list(set([label for label, _ in counter.keys()]))
@@ -67,7 +67,7 @@ def get_PRF_scores(
         }
         return scores_label        
 
-    scores['overall'] = _get_scores(label_overall, t_counter)
+    scores['Overall'] = _get_scores(label_overall, t_counter)
     for label in labels:
         scores['each_label'][label] = _get_scores(label, counter)
 
@@ -77,8 +77,8 @@ def get_PRF_scores(
 def get_PRF_scores_str(scores):
     res = 'label\tn_gold\tn_pred\tn_corr\tP\tR\tF\n'
 
-    s = scores['overall']
-    res += f'overall\t{s["n_gold"]}\t{s["n_prediction"]}\t{s["n_correct"]}\t{s["precision"]:.3f}\t{s["recall"]:.3f}\t{s["f1"]:.3f}\n'
+    s = scores['Overall']
+    res += f'Overall\t{s["n_gold"]}\t{s["n_prediction"]}\t{s["n_correct"]}\t{s["precision"]:.3f}\t{s["recall"]:.3f}\t{s["f1"]:.3f}\n'
 
     for label, s in scores['each_label'].items():
         res += f'{label}\t{s["n_gold"]}\t{s["n_prediction"]}\t{s["n_correct"]}\t{s["precision"]:.3f}\t{s["recall"]:.3f}\t{s["f1"]:.3f}\n'
