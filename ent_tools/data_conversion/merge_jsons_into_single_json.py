@@ -2,13 +2,11 @@ import argparse
 from collections import Counter
 import json
 import os
-import sys
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
-from common.data_io import load_json, write_as_json
+from ent_tools.common.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
+from ent_tools.common.data_io import load_json, write_as_json
 
 
 def main():
