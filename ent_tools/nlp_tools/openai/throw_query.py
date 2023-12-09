@@ -176,7 +176,12 @@ def main():
         default=5,
     )
     parser.add_argument(
-        '--price_per_token',
+        '--input_price_per_token',
+        type=float,
+        default=0,
+    )
+    parser.add_argument(
+        '--output_price_per_token',
         type=float,
         default=0,
     )
@@ -226,7 +231,8 @@ def main():
 
     # Throw API query for each input example
     calc_price = (not args.simulate_without_price_estimation
-                  and args.price_per_token > 0
+                  and args.input_price_per_token > 0
+                  and args.output_price_per_token > 0
                   and args.rate_dollar_to_yen > 0)
     total_price_dol = 0
     total_n_tokens = 0
@@ -237,19 +243,20 @@ def main():
                    + (f'{msg_examples}\n' if msg_examples else '')
                    + f'{args.prompt_input_head}{text}\n{args.prompt_input_tail}')
 
-            if calc_price:
-                n_tokens = len(encoder.encode(msg))
-                total_n_tokens += n_tokens
-                price_dol = n_tokens * args.price_per_token
-                price_yen = price_dol * args.rate_dollar_to_yen
-                total_price_dol += price_dol
-                logger.info(f'Estimated price: ${price_dol:.6f}; \\{price_yen:.6f}; {n_tokens} tokens')
+            # if calc_price:
+            #     n_tokens = len(encoder.encode(msg))
+            #     total_n_tokens += n_tokens
+            #     price_dol = n_tokens * args.price_per_token
+            #     price_yen = price_dol * args.rate_dollar_to_yen
+            #     total_price_dol += price_dol
+            #     logger.info(f'Estimated price: ${price_dol:.6f}; \\{price_yen:.6f}; {n_tokens} tokens')
 
             if (args.simulate_with_price_estimation
                 or args.simulate_without_price_estimation
             ):
                 logger.info(f'Query (simulation):\n{msg}')
-                results.append(None)
+                res_content = None
+                results.append(res_content)
             else:
                 retry_flag = True
                 retry_num = 0
@@ -276,6 +283,24 @@ def main():
                 if args.waiting_time_second > 0:
                     logger.info(f'Wait {args.waiting_time_second} seconds.')
                     time.sleep(args.waiting_time_second)
+
+            if calc_price:
+                # input
+                input_n_tokens   = len(encoder.encode(msg))
+                input_price_dol  = input_n_tokens * args.input_price_per_token
+                input_price_yen  = input_price_dol * args.rate_dollar_to_yen
+                total_n_tokens  += input_n_tokens
+                total_price_dol += input_price_dol
+                logger.info(f'Estimated price for input: ${input_price_dol:.6f}; \\{input_price_yen:.6f}; {input_n_tokens} tokens')
+
+                # output
+                if res_content != None:
+                    output_n_tokens  = len(encoder.encode(res_content))
+                    output_price_dol = output_n_tokens * args.output_price_per_token
+                    output_price_yen = output_price_dol * args.rate_dollar_to_yen
+                    total_n_tokens  += output_n_tokens
+                    total_price_dol += output_price_dol
+                    logger.info(f'Estimated price for output: ${output_price_dol:.6f}; \\{output_price_yen:.6f}; {output_n_tokens} tokens')
 
         else:
             logger.info(f'Skip empty text')
