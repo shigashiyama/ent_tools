@@ -29,8 +29,8 @@ for TXT_PATH in $DATA_IN_DIR/*.txt; do
            -tsv $TSV_PATH
 
     ## Run ginza and save as conll
-    # cut -f4 $TSV_PATH | ginza -d -m $MODEL_NAME > $GINZA_CNL_PATH
-    # echo "Save: $GINZA_CNL_PATH"
+    cut -f4 $TSV_PATH | ginza -d -m $MODEL_NAME > $GINZA_CNL_PATH
+    echo "Save: $GINZA_CNL_PATH"
 
     ## Convert conll -> ann (for brat)
     poetry run python ent_tools/data_conversion/ginza_conll_to_ann.py \

@@ -8,7 +8,7 @@ import spacy
 from spacy.tokens import DocBin
 from spacy.util import filter_spans
 
-from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.util.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
 from ent_tools.nlp_tools.spacy.util import load_model
 
 

@@ -5,8 +5,8 @@ from typing import Tuple
 
 from logzero import logger
 
-from ent_tools.common.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
-from ent_tools.common.data_io import write_as_json
+from ent_tools.util.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.util.data_io import write_as_json
 
 
 def get_spans(

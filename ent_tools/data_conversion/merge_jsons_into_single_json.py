@@ -5,8 +5,8 @@ import os
 
 from logzero import logger
 
-from ent_tools.common.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
-from ent_tools.common.data_io import load_json, write_as_json
+from ent_tools.util.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
+from ent_tools.util.data_io import load_json, write_as_json
 
 
 def main():

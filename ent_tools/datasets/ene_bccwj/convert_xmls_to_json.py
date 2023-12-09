@@ -7,7 +7,7 @@ from typing import Tuple
 
 from logzero import logger
 
-from ent_tools.common.constants import NON_ENTITY, SENS, TXT, MEN_IDS, MENS, SEN_ID, SPAN, ENT_TYPE
+from ent_tools.util.constants import NON_ENTITY, SENS, TXT, MEN_IDS, MENS, SEN_ID, SPAN, ENT_TYPE
 
 
 def load_id_list(

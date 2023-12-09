@@ -9,7 +9,7 @@ from spacy.scorer import Scorer
 from spacy.training import Example
 from spacy.tokens import DocBin
 
-from ent_tools.common.data_io import load_json
+from ent_tools.util.data_io import load_json
 from ent_tools.nlp_tools.spacy.data_io import load_spacy_data
 from ent_tools.nlp_tools.spacy.util import load_model, prepare_ner_model
 

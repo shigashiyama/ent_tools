@@ -4,7 +4,7 @@ import os
 import logzero
 from logzero import logger
 
-from ent_tools.common.data_io import write_as_json
+from ent_tools.util.data_io import write_as_json
 from ent_tools.data_conversion.brat_util import get_subdoc_spans, gen_doc_dict
 
 

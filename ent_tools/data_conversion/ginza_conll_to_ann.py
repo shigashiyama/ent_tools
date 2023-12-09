@@ -2,8 +2,8 @@ import argparse
 
 from logzero import logger
 
-from ent_tools.common.constants import NON_ENTITY
-from ent_tools.common.data_io import load_json
+from ent_tools.util.constants import NON_ENTITY
+from ent_tools.util.data_io import load_json
 from ent_tools.data_conversion.util import read_tsv, get_spans_from_BIO_seq
 
 

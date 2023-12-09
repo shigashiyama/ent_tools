@@ -2,7 +2,7 @@ from typing import Tuple
 
 from logzero import logger
 
-from ent_tools.common.constants import SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.util.constants import SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
 
 
 def merge_clusters_until_convergence(

@@ -2,8 +2,8 @@ import argparse
 
 from logzero import logger
 
-from ent_tools.common.data_io import load_json
-from ent_tools.common.data_statistics import get_stats_from_dict, get_stats_from_docbin
+from ent_tools.util.data_io import load_json
+from ent_tools.util.data_statistics import get_stats_from_dict, get_stats_from_docbin
 from ent_tools.nlp_tools.spacy.data_io import convert_dict_to_docbin
 
 
