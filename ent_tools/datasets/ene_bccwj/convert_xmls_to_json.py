@@ -2,14 +2,12 @@ import argparse
 import json
 import os
 import re
-import sys
 import xml.etree.ElementTree as ET
 from typing import Tuple
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.constants import NON_ENTITY, SENS, TXT, MEN_IDS, MENS, SEN_ID, SPAN, ENT_TYPE
+from ent_tools.common.constants import NON_ENTITY, SENS, TXT, MEN_IDS, MENS, SEN_ID, SPAN, ENT_TYPE
 
 
 def load_id_list(
@@ -120,7 +118,7 @@ def parse_text_line(
                         + (sschild.tail if sschild.tail else '')
                         + (schild.tail if sschild.tail else ''))
                     texts.append(child_text)
-                    # ignore nested tags
+                    # TODO: Nested tags are ignored
                     labels.append(child.tag)
                     
                 else:

@@ -10,19 +10,19 @@
 
 mkdir -p data/processed/gsk-ene-bccwj/json/
 
-python src/datasets/ene_bccwj/convert_xmls_to_json.py \
+poetry run python ent_tools/datasets/ene_bccwj/convert_xmls_to_json.py \
        -x data/original/gsk-ene/bccwj/xml \
        -j data/processed/gsk-ene-bccwj/json/bccwj-exPN-train.json \
        -i data/supplement/UD_Japanese-BCCWJ/UDJB_train_ids.txt \
        --exclude_domains PN
 
-python src/datasets/ene_bccwj/convert_xmls_to_json.py \
+poetry run python ent_tools/datasets/ene_bccwj/convert_xmls_to_json.py \
        -x data/original/gsk-ene/bccwj/xml \
        -j data/processed/gsk-ene-bccwj/json/bccwj-exPN-dev.json \
        -i data/supplement/UD_Japanese-BCCWJ/UDJB_dev_ids.txt \
        --exclude_domains PN
 
-python src/datasets/ene_bccwj/convert_xmls_to_json.py \
+poetry run python ent_tools/datasets/ene_bccwj/convert_xmls_to_json.py \
        -x data/original/gsk-ene/bccwj/xml \
        -j data/processed/gsk-ene-bccwj/json/bccwj-exPN-test.json \
        -i data/supplement/UD_Japanese-BCCWJ/UDJB_test_ids.txt \
