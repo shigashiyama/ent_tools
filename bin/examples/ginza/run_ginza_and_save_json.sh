@@ -6,7 +6,6 @@ MODEL_NAME="ja_ginza_electra"
 DATA_IN_DIR=data/original/sample_ja_ner
 DATA_OUT_DIR=data/output/sample_ja_ner/ginza/$MODEL_NAME
 mkdir -p $DATA_OUT_DIR
-mkdir -p $DATA_OUT_DIR/txt
 mkdir -p $DATA_OUT_DIR/tsv_for_ner
 mkdir -p $DATA_OUT_DIR/conll_per_doc
 mkdir -p $DATA_OUT_DIR/json_per_doc
@@ -27,7 +26,7 @@ for TXT_PATH in $DATA_IN_DIR/*.txt; do
     GINZA_JSON_PATH=$DATA_OUT_DIR/json_per_doc/$DOC_NAME.json
     
     ## Convert txt -> tsv (for ginza)
-    python src/data_conversion/txt_to_tsv_for_auto_ner.py \
+    poetry run python ent_tools/data_conversion/txt_to_tsv_for_auto_ner.py \
            -itxt $TXT_PATH \
            -tsv $TSV_PATH
 
@@ -36,13 +35,13 @@ for TXT_PATH in $DATA_IN_DIR/*.txt; do
     echo "Save: $GINZA_CNL_PATH"
 
     ## Convert conll -> json
-    python src/data_conversion/ginza_conll_to_json.py \
+    poetry run python ent_tools/data_conversion/ginza_conll_to_json.py \
            -conll $GINZA_CNL_PATH \
            -json $GINZA_JSON_PATH \
            -tsv $TSV_PATH
 done
 
 ## Merge json files into a single json file
-python src/data_conversion/merge_jsons_into_single_json.py \
+poetry run python ent_tools/data_conversion/merge_jsons_into_single_json.py \
        -i $DATA_OUT_DIR/json_per_doc \
        -o $DATA_OUT_DIR/json/all.json

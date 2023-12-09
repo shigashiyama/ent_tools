@@ -4,11 +4,9 @@ import sys
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.constants import NON_ENTITY, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
-from common.data_io import load_json
-from data_conversion.util import read_tsv, get_spans_from_BIO_seq
-from common.data_io import write_as_json
+from ent_tools.common.constants import NON_ENTITY, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.common.data_io import load_json, write_as_json
+from ent_tools.data_conversion.util import read_tsv, get_spans_from_BIO_seq
 
 
 def gen_doc_dict(
@@ -33,7 +31,6 @@ def gen_doc_dict(
             line = line.rstrip('\n')
 
             if line.startswith('#'):
-                # sen = line.split(' ')[3]
                 continue
 
             elif not line:

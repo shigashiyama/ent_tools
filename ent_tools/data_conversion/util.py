@@ -1,6 +1,6 @@
 from logzero import logger
 
-from common.constants import NON_ENTITY
+from ent_tools.common.constants import NON_ENTITY
 
 
 def read_tsv(

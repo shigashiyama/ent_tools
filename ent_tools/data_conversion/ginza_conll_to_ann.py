@@ -1,12 +1,10 @@
 import argparse
-import sys
 
 from logzero import logger
 
-sys.path.append('src')          # TODO remove
-from common.constants import NON_ENTITY
-from common.data_io import load_json
-from data_conversion.util import read_tsv, get_spans_from_BIO_seq
+from ent_tools.common.constants import NON_ENTITY
+from ent_tools.common.data_io import load_json
+from ent_tools.data_conversion.util import read_tsv, get_spans_from_BIO_seq
 
 
 def read_and_write(
@@ -31,7 +29,6 @@ def read_and_write(
             line = line.rstrip('\n')
 
             if line.startswith('#'):
-                # sen = line.split(' ')[3]
                 continue
 
             elif not line:
