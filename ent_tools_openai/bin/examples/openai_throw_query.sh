@@ -37,7 +37,7 @@ for INPUT_TXT_PATH in $INPUT_TXT_DIR/*.txt; do
     OUTPUT_TXT_PATH=$OUTPUT_DIR/txt/$DOC_NAME.txt
     OUTPUT_JSON_PATH=$OUTPUT_DIR/json_per_doc/$DOC_NAME.json
 
-    poetry run python ent_tools_openai/throw_query.py \
+    python ent_tools_openai/throw_query.py \
            -i $INPUT_TXT_PATH \
            -o $OUTPUT_TXT_PATH \
            -org $ORGANIZATION \
@@ -51,12 +51,12 @@ for INPUT_TXT_PATH in $INPUT_TXT_DIR/*.txt; do
            --input_price_per_token $INPUT_PRICE_PER_TOKEN \
            --output_price_per_token $OUTPUT_PRICE_PER_TOKEN
     
-    poetry run python ent_tools_openai/convert_output_to_json.py \
+    python ent_tools_openai/convert_output_to_json.py \
            -i $OUTPUT_TXT_PATH \
            -o $OUTPUT_JSON_PATH
 done
 
 ## Merge json files into a single json file
-poetry run python ../ent_tools/ent_tools/data_conversion/merge_jsons_into_single_json.py \
+python ../ent_tools/ent_tools/data_conversion/merge_jsons_into_single_json.py \
        -i $OUTPUT_DIR/json_per_doc \
        -o $OUTPUT_DIR/json/all.json

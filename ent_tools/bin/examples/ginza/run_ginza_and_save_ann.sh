@@ -24,7 +24,7 @@ for TXT_PATH in $DATA_IN_DIR/*.txt; do
     ANN_PATH=$DATA_OUT_DIR/brat/$DOC_NAME.ann
     
     ## Convert txt -> tsv (for ginza)
-    poetry run python ent_tools/data_conversion/txt_to_tsv_for_auto_ner.py \
+    python ent_tools/data_conversion/txt_to_tsv_for_auto_ner.py \
            -itxt $TXT_PATH \
            -tsv $TSV_PATH
 
@@ -33,7 +33,7 @@ for TXT_PATH in $DATA_IN_DIR/*.txt; do
     echo "Save: $GINZA_CNL_PATH"
 
     ## Convert conll -> ann (for brat)
-    poetry run python ent_tools/data_conversion/ginza_conll_to_ann.py \
+    python ent_tools/data_conversion/ginza_conll_to_ann.py \
            -conll $GINZA_CNL_PATH \
            -ann $ANN_PATH \
            -tsv $TSV_PATH \

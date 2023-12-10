@@ -12,7 +12,7 @@ LABEL_CONVERSION_MAP=
 # file to output scores
 SCORE_JSON=
 
-poetry run python ent_tools/evaluate/evaluate_mention_recognition.py \
+python ent_tools/evaluate/evaluate_mention_recognition.py \
        -g $GOLD_JSON \
        -p $PRED_JSON \
        -l $LABEL_CONVERSION_MAP \

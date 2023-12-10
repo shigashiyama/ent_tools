@@ -18,7 +18,7 @@ for TXT_PATH in $INPUT_DIR/*.txt; do
     DOC_NAME=${FILE_NAME%.*}
     ANN_PATH=$INPUT_DIR/$DOC_NAME.ann
     
-    poetry run python ent_tools/data_conversion/brat_ann_to_json.py \
+    python ent_tools/data_conversion/brat_ann_to_json.py \
            -txt $TXT_PATH \
            -ann $ANN_PATH \
            -json_dir $OUTPUT_DIR/json_per_doc \
@@ -27,6 +27,6 @@ done
 
 ## Merge json files into a single json file
 MERGED_JSON_PATH=$OUTPUT_DIR/json/all.json
-poetry run python ent_tools/data_conversion/merge_jsons_into_single_json.py \
+python ent_tools/data_conversion/merge_jsons_into_single_json.py \
        -i $OUTPUT_DIR/json_per_doc \
        -o $MERGED_JSON_PATH
