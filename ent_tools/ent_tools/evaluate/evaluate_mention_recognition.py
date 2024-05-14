@@ -4,7 +4,9 @@ from typing import Tuple
 
 from logzero import logger
 
-from ent_tools.util.constants import DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE
+from ent_tools.util.constants import (
+    DOC_ID, SENS, SEN_ID, TXT, MEN_IDS, MENS, SPAN, ENT_TYPE, ANY,
+)
 from ent_tools.util.data_io import load_json, write_as_json
 from ent_tools.evaluate.util import GOLD, PRED, CORRECT
 from ent_tools.evaluate.util import get_PRF_scores, get_PRF_scores_str
@@ -13,18 +15,30 @@ from ent_tools.evaluate.util import get_PRF_scores, get_PRF_scores_str
 class CountForMR:
     def __init__(self, 
                  labelmap: dict = None,
+                 target_labels: list = None,
+                 ignore_label_difference: bool = False,
     ):
         self.counter = Counter()
-        self.labelmap = labelmap
+        self.target_labels = target_labels
+        self.ignore_label_difference = ignore_label_difference
+
+        if self.ignore_label_difference:
+            self.labelmap = None
+        else:
+            self.labelmap = labelmap 
 
 
     def update_for_dataset(
             self,
             gold_data: dict,
             pred_data: dict,
+            target_docids: set[str],
     ) -> None:
 
         for doc_id, gold_doc in gold_data.items():
+            if target_docids and not doc_id in target_docids:
+                continue
+
             logger.info(f'Count spans for {doc_id}.')
 
             sen_ids = gold_doc[SENS].keys()
@@ -32,14 +46,35 @@ class CountForMR:
             sen_id2pred_spans = {sen_id: [] for sen_id in sen_ids}
 
             for men_id, men in gold_doc[MENS].items():
-                sen_id2gold_spans[men[SEN_ID]].append(
-                    (men[SPAN][0], men[SPAN][1], men[ENT_TYPE]))
+                label = men[ENT_TYPE]
+                if self.target_labels:
+                    if self.labelmap:
+                        if (not label in self.labelmap
+                            or not self.labelmap[label] in self.target_labels
+                        ):
+                            continue                            
+                    else:
+                        if not label in self.target_labels:
+                            continue
+
+                if self.ignore_label_difference:
+                    label = ANY
+
+                sen_id2gold_spans[men[SEN_ID]].append((men[SPAN][0], men[SPAN][1], label))
 
             if doc_id in pred_data:
                 pred_doc = pred_data[doc_id]
                 for men_id, men in pred_doc[MENS].items():
-                    sen_id2pred_spans[men[SEN_ID]].append(
-                        (men[SPAN][0], men[SPAN][1], men[ENT_TYPE]))
+                    label = men[ENT_TYPE]
+                    if (self.target_labels
+                        and not label in self.target_labels
+                    ):
+                        continue
+                
+                    if self.ignore_label_difference:
+                        label = ANY
+
+                    sen_id2pred_spans[men[SEN_ID]].append((men[SPAN][0], men[SPAN][1], label))
 
             else:
                 logger.warning(f'Prediction for {doc_id} is not available.')
@@ -50,6 +85,8 @@ class CountForMR:
 
     def update(self, gold_spans, pred_spans):
         if self.labelmap:
+            gold_spans = [(gb, ge, self.labelmap[glabel])
+                          for gb, ge, glabel in gold_spans if glabel in self.labelmap]
             pred_spans = [(pb, pe, self.labelmap[plabel])
                           for pb, pe, plabel in pred_spans if plabel in self.labelmap]
 
@@ -110,6 +147,20 @@ def main():
         default=None,
     )
     parser.add_argument(
+        '--target_docids', '-d',
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        '--target_labels',
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        '--ignore_label_difference',
+        action='store_true'
+    )
+    parser.add_argument(
         '--label_display_order',
         type=str,
         default=None,
@@ -120,7 +171,19 @@ def main():
     if args.label_conversion_map_path:
         labelmap = load_json(args.label_conversion_map_path)
 
-    count = CountForMR(labelmap=labelmap)
+    target_docids = set()
+    if args.target_docids:
+        target_docids = set(args.target_docids.split(','))
+
+    target_labels = []
+    if args.target_labels:
+        target_labels = args.target_labels.split(',')
+
+    count = CountForMR(
+        labelmap=labelmap,
+        target_labels=target_labels,
+        ignore_label_difference=args.ignore_label_difference,
+    )
 
     label_display_order = []
     if args.label_display_order:
@@ -129,7 +192,7 @@ def main():
 
     gold_data = load_json(args.gold_path)
     pred_data = load_json(args.pred_path)
-    count.update_for_dataset(gold_data, pred_data)
+    count.update_for_dataset(gold_data, pred_data, target_docids=target_docids)
 
     scores = get_PRF_scores(count.counter, label_display_order=label_display_order)
     if args.output_score_path:

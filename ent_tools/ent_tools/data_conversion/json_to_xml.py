@@ -2,7 +2,9 @@ import argparse
 
 from logzero import logger
 
-from ent_tools.util.constants import DOC_ID, SENS, MENS, TXT, MEN_IDS, SPAN, ENT_TYPE
+from ent_tools.util.constants import (
+    DOC_ID, ENT_ID, MEN_IDS, MEM_MEN_IDS, SENS, MENS, ENTS, TXT, SPAN, ENT_TYPE
+)
 from ent_tools.util.data_io import load_json
 
 
@@ -13,6 +15,8 @@ TXT_BEGIN    = "<text>"
 TXT_END      = "</text>"
 MEN_BEGIN    = "<mention>"
 MEN_END      = "</mention>"
+ENTS_BEGIN   = "<entities>"
+ENTS_END     = "</entities>"
 
 
 def read_and_write(
@@ -22,7 +26,7 @@ def read_and_write(
 
     data = load_json(input_json)
 
-    with open(output_xml, 'w') as fw:
+    with open(output_xml, 'w', encoding='utf-8') as fw:
         for doc_id, doc in data.items():
             fw.write(f'{XML_DEC_LINE}\n')
             if doc_id:
@@ -44,7 +48,7 @@ def read_and_write(
                     men_span = men[SPAN]
                     men_text = men[TXT]
                     etype = men[ENT_TYPE]
-                    sen_new += f'{sen_text[:men[SPAN][0]]}<mention entity_type="{etype}">{men_text}{MEN_END}'
+                    sen_new += f'{sen_text[prev_span_end:men[SPAN][0]]}<mention mention_id="{men_id}" entity_type="{etype}">{men_text}{MEN_END}'
                     sen_new_wo_tag += f'{sen_text[prev_span_end:men[SPAN][0]]}{men_text}'
                     prev_span_end = men_span[1]
 
@@ -52,12 +56,22 @@ def read_and_write(
                     sen_new += sen_text[prev_span_end:]
                     sen_new_wo_tag += sen_text[prev_span_end:]
 
-                assert sen_new_wo_tag == sen_text
-                fw.write(f'{sen_new}\n')
+                assert sen_new_wo_tag == sen_text, f'\nOrig: {sen_text}\nNew: {sen_new}\nNew_wo_tag: {sen_new_wo_tag}'
+                fw.write(f'<sentence sentence_id="{sen_id}">{sen_new}</sentence>\n')
 
-                # fw.write(f'{sen_text}\t{mens_str}\n')
-                # print(f'{sen_text}\t{mens_str}')
             fw.write(f'{TXT_END}\n')
+
+            if ENTS in doc and doc[ENTS]:
+                fw.write(f'{ENTS_BEGIN}\n')
+
+                for ent_id, ent in doc[ENTS].items():
+                    line_ent = f'<entity {ENT_ID}="{ent_id}" '
+                    mids_str = ';'.join(sorted(ent[MEM_MEN_IDS], key=lambda x: int(x[1:])))
+                    line_ent = line_ent.rstrip(" ")
+                    line_ent += f'>{mids_str}</entity>'
+                    fw.write(f'{line_ent}\n')
+            fw.write(f'{ENTS_END}\n')
+
             fw.write(f'{DOC_END}\n')
 
     logger.info(f'Save: {output_xml}')

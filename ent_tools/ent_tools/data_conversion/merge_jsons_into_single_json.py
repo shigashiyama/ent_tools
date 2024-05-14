@@ -5,7 +5,7 @@ import os
 
 from logzero import logger
 
-from ent_tools.util.constants import SENS, MENS, ENT_TYPE, MEN_TYPE
+from ent_tools.util.constants import SENS, MENS, ENTS, MEM_MEN_IDS, TXT, ENT_TYPE, MEN_TYPE, HAS_REF, REF_URL
 from ent_tools.util.data_io import load_json, write_as_json
 
 
@@ -32,6 +32,7 @@ def main():
         with open(args.target_ids_path) as f:
             for line in f:
                 target_ids.add(line.strip('\n'))
+        logger.info(f'Target ids: {target_ids}')
     else:
         target_ids = None
 
@@ -59,26 +60,77 @@ def main():
 
         # show statistics
         counter = Counter()
+        key2sets = {'num_mens': set()}
+
         for doc_id, doc in data.items():
             counter['num_docs'] += 1
-            counter['num_sens'] += len(doc[SENS])
-            counter['num_mens'] += len(doc[MENS])
+            if SENS in doc:
+                counter['num_sens'] += len(doc[SENS])
 
-            for men_id, men in doc[MENS].items():
-                if ENT_TYPE in men:
-                    counter[f'num_mens:{men[ENT_TYPE]}'] += 1
-                if MEN_TYPE in men:
-                    counter[f'num_mens:{men[MEN_TYPE]}'] += 1
+            if MENS in doc:
+                counter['num_mens'] += len(doc[MENS])
+
+                for men_id, men in doc[MENS].items():
+                    key2sets['num_mens'].add(men[TXT])
+
+                    if ENT_TYPE in men:
+                        key = f'num_mens:{men[ENT_TYPE]}'
+                        counter[key] += 1
+                        if not key in key2sets:
+                            key2sets[key] = set()
+                        key2sets[key].add(men[TXT])
+
+                    if MEN_TYPE in men:
+                        counter[f'num_mens:{men[MEN_TYPE]}'] += 1
+
+            if ENTS in doc:
+                counter['num_ents'] += len(doc[ENTS])
+
+                for ent_id, ent in doc[ENTS].items():
+                    if HAS_REF in ent and ent[HAS_REF]:
+                        counter['num_ents:has_ref'] += 1
+
+                    has_name = False
+                    for men_id in ent[MEM_MEN_IDS]:
+                        men = doc[MENS][men_id]
+                        if men[ENT_TYPE].endswith('NAME'):
+                            has_name = True
+
+                    if has_name:
+                        counter['num_ents:has_name'] += 1
+
+                    # tmp
+                    if REF_URL in ent:
+                        if ent[REF_URL].startswith('https://www.wikidata.org'):
+                            key = 'num_ents:has_wikidata_ref'
+                            counter[key] += 1
+                            if not key in key2sets:
+                                key2sets[key] = set()
+                            key2sets[key].add(ent[REF_URL])
+                        else:
+                            key = 'num_ents:has_other_ref'
+                            counter[key] += 1
+                            if not key in key2sets:
+                                key2sets[key] = set()
+                            key2sets[key].add(ent[REF_URL])
 
         logger.info('Data statistics.')
-        main_keys = ['num_docs', 'num_sens', 'num_mens']
+        main_keys = ['num_docs', 'num_sens', 'num_mens', 'num_ents']
         for key in main_keys:
             val = counter[key]
-            logger.info(f'{key}\t{val}')
+            if key in key2sets:
+                val2 = len(key2sets[key])
+                logger.info(f'{key}\t{val}\t({val2})')
+            else:
+                logger.info(f'{key}\t{val}')
             
         for key, val in sorted(counter.items()):
             if not key in main_keys:
-                logger.info(f'{key}\t{val}')
+                if key in key2sets:
+                    val2 = len(key2sets[key])
+                    logger.info(f'{key}\t{val}\t({val2})')
+                else:
+                    logger.info(f'{key}\t{val}')
 
 
 if __name__ == '__main__':

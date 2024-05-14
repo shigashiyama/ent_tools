@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 logzero = "1.7.0"
+ja-sentence-segmenter = "^0.0.2"
+scikit-learn = "^1.4.2"
 
 
 [build-system]
