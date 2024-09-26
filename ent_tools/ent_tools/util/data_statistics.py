@@ -1,10 +1,6 @@
 from collections import Counter
 
-import spacy
-from spacy import Language
-from spacy.tokens import DocBin
-
-from ent_tools.util.constants import DOC_ID, SENS, SEN_ID, MENS, ENT_TYPE
+from ent_tools.util.constants import SENS, MENS, ENTS, ENT_TYPE
 
 
 def get_stats_from_dict(
@@ -26,5 +22,8 @@ def get_stats_from_dict(
         for men_id, men in mens.items():
             etype = men[ENT_TYPE]
             c_cate[etype] += 1
+
+        ents = doc[ENTS]
+        c_basic['n_entity'] += len(ents)
 
     return c_basic, c_cate
