@@ -227,6 +227,11 @@ def convert_json_for_jel(
 
         doc_new[ENTS][ent_id_tmp] = ent_new
 
+    # tmp 2024/7/22
+    merge_flag = True
+    if merge_flag:
+        return doc_new
+
     # merge entities with the same URL and ref_type = None/VAGUE
     ent_id_num = 1
     old_to_new_entid = {}
