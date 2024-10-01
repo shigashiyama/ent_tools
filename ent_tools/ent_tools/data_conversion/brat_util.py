@@ -367,13 +367,15 @@ def gen_doc_dict(
             bol_idx = eol_idx
             sen_dict[MEN_IDS] = men_ids_new
 
-    men1_to_dir_pair_str = {}
+    men1_to_dir_pair_strs = {}
     if directed_rels:
         for rel_name, men_id_old1, men_id_old2 in directed_rels:
             if men_id_old1 in menid_old2new and men_id_old2 in menid_old2new:
                 men_id_new1 = menid_old2new[men_id_old1]
                 men_id_new2 = menid_old2new[men_id_old2]
-                men1_to_dir_pair_str[men_id_new1] = f'{men_id_new1}-{men_id_new2}'
+                if not men_id_new1 in men1_to_dir_pair_strs:
+                    men1_to_dir_pair_strs[men_id_new1] = []
+                men1_to_dir_pair_strs[men_id_new1].append(f'{men_id_new1}-{men_id_new2}')
 
     # fix order of dict registration
     for ent_id_num_i in range(1, ent_id_num):
@@ -389,8 +391,8 @@ def gen_doc_dict(
 
         directed_men_pairs = []
         for men_id_new in ent_dict[MEM_MEN_IDS]:
-            if men_id_new in men1_to_dir_pair_str:
-                directed_men_pairs.append(men1_to_dir_pair_str[men_id_new])
+            if men_id_new in men1_to_dir_pair_strs:
+                directed_men_pairs.extend(men1_to_dir_pair_strs[men_id_new])
         if directed_men_pairs:
             ent_dict[DIR_MEN_PAIRS] = ';'.join(sorted(directed_men_pairs))
 
